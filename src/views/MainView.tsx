@@ -7,12 +7,23 @@ import { LoaderCircle, RefreshCcwDot } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { notesService } from "services/NotesService";
 import { FileData } from "types/Notebook";
-import { noAmazonCookies } from "../util/amazonApiUtils";
+import { AmazonApiError, noAmazonCookies } from "../util/amazonApiUtils";
 import { NoCookiesView } from './NoCookiesView';
 
 type RefetchFn = () => Promise<QueryObserverResult<FileData[], Error>>;
 
-const NotesError = ({ refetch }: { refetch: RefetchFn }) => {
+const ErrorDetail = ({ error }: { error: Error }) => {
+    if (!(error instanceof AmazonApiError)) {
+        return <code style={{ display: 'block', paddingTop: '15px' }}>{error.message}</code>;
+    }
+
+    return <details style={{ paddingTop: '15px', textAlign: 'left' }}>
+        <summary>{error.message}</summary>
+        <pre style={{ whiteSpace: 'pre-wrap', maxHeight: '200px', overflow: 'auto' }}>{error.body}</pre>
+    </details>;
+};
+
+const NotesError = ({ refetch, error }: { refetch: RefetchFn, error: Error }) => {
     return <div className="error-text">
         <p>Failed to fetch notes. </p>
         <p>Probably caused by <b>outdated/non-existing</b> Amazon cookies.<br />
@@ -20,6 +31,7 @@ const NotesError = ({ refetch }: { refetch: RefetchFn }) => {
         </p>
         <button onClick={() => void doAmazonLogin().then(login => login && refetch())}>Login to Amazon</button>
         <code style={{ paddingTop: '15px' }}>If that doesn't work - try <b>Logging out and then logging in</b>.</code>
+        <ErrorDetail error={error} />
     </div>;
 };
 
@@ -70,7 +82,7 @@ export const MainView = () => {
                 setIsLoggedOut={() => setIsLoggedOut(true)}
                 refetch={refetch} />
             <div className="notes-content">
-                {error ? <NotesError refetch={refetch} /> : contentLoading ? <LoadingComponent /> : <NotesList objects={data} />}
+                {error ? <NotesError refetch={refetch} error={error} /> : contentLoading ? <LoadingComponent /> : <NotesList objects={data} />}
             </div>
         </div>
     );
