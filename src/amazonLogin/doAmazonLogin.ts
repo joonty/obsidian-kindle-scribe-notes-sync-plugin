@@ -46,11 +46,8 @@ export const doAmazonLogin = async () => {
       onChildWindow: childWindow => childWindows.push(childWindow),
     });
 
-    try {
-      void modal.loadURL('https://read.amazon.com/notebook');
-    } catch {
-      // Swallow error. `loadUrl` is interrupted on successful
-      // login as we immediately redirect if user is logged in
-    }
+    // `loadURL` rejects asynchronously with ERR_ABORTED when the modal closes
+    // mid-navigation, which is what a successful login does.
+    void modal.loadURL('https://read.amazon.com/notebook').catch(() => undefined);
   });
 }

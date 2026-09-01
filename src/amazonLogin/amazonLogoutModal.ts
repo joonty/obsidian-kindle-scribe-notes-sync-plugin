@@ -46,11 +46,8 @@ export const amazonLogoutModal = () => {
       onChildWindow: childWindow => childWindows.push(childWindow),
     });
 
-    try {
-      void modal.loadURL('https://www.amazon.com/gp/flex/sign-out.html');
-    } catch {
-      // Swallow error. `loadUrl` is interrupted on successful
-      // logout as we immediately redirect to the sign-in page
-    }
+    // `loadURL` rejects asynchronously with ERR_ABORTED when the modal closes
+    // mid-navigation, which is what a successful logout does.
+    void modal.loadURL('https://www.amazon.com/gp/flex/sign-out.html').catch(() => undefined);
   });
 };
