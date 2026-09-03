@@ -1,7 +1,7 @@
 {
 	"id": "kindle-scribe-notes-sync",
 	"name": "Kindle Scribe Notes Sync",
-	"version": "0.3.4",
+	"version": "0.3.5-dev",
 	"minAppVersion": "0.15.0",
 	"description": "Synchronizes and processes(via OpenRouter models) notes from Kindle Scribe into Obsidian.",
 	"author": "Obsidian",
